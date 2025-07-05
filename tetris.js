@@ -175,14 +175,18 @@ function pieceRotate() {
 }
 
 function resetPiece() {
+    console.log('resetPiece called');
     currentPiece = nextPiece;
     nextPiece = createPiece();
     drawNext();
-    if (collide(board, currentPiece)) {
+    const isColliding = collide(board, currentPiece);
+    console.log('resetPiece: isColliding =', isColliding);
+    if (isColliding) {
         // Game Over
         board.forEach(row => row.fill(8)); // Use a different color for game over
         score = 'GAME OVER';
         updateScore();
+        console.log('Game Over detected in resetPiece');
         // Stop the game loop if you want
     }
 }
@@ -208,6 +212,7 @@ let dropInterval = 1000; // 1 second
 let lastTime = 0;
 
 function update(time = 0) {
+    console.log('update called, score:', score);
     if (score === 'GAME OVER') return;
     const deltaTime = time - lastTime;
     lastTime = time;
