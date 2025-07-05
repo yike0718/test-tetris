@@ -236,6 +236,20 @@ document.addEventListener('keydown', event => {
     }
 });
 
+// Mobile controls
+document.getElementById('move-left').addEventListener('click', () => {
+    pieceMove(-1);
+});
+document.getElementById('move-right').addEventListener('click', () => {
+    pieceMove(1);
+});
+document.getElementById('move-down').addEventListener('click', () => {
+    pieceDrop();
+});
+document.getElementById('rotate').addEventListener('click', () => {
+    pieceRotate();
+});
+
 nextPiece = createPiece();
 resetPiece();
 updateScore();
