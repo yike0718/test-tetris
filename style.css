@@ -31,14 +31,16 @@ body {
 
 .score-display,
 .next-piece-display {
-    margin-bottom: 20px;
-    font-size: 1.2em;
+    margin-bottom: 15px;
+    font-size: 1em;
 }
 
 #next-canvas {
     background-color: #000;
     border: 1px solid #555;
-    margin-top: 10px;
+    margin-top: 8px;
+    width: 90px;
+    height: 90px;
 }
 
 .controls {
