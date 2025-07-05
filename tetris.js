@@ -148,18 +148,34 @@ function pieceMove(dir) {
 }
 
 function pieceRotate() {
-    const pos = currentPiece.pos.x;
-    let offset = 1;
-    currentPiece.matrix = rotate(currentPiece.matrix, 1);
-    while (collide(board, currentPiece)) {
-        currentPiece.pos.x += offset;
-        offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > currentPiece.matrix[0].length) {
-            currentPiece.matrix = rotate(currentPiece.matrix, -1);
-            currentPiece.pos.x = pos;
+    const originalMatrix = currentPiece.matrix;
+    const originalPos = { x: currentPiece.pos.x, y: currentPiece.pos.y };
+
+    currentPiece.matrix = rotate(originalMatrix, 1); // Try clockwise rotation
+
+    // Wall kick attempts
+    const kickTests = [
+        { x: 0, y: 0 }, // No kick
+        { x: -1, y: 0 }, // Kick left 1
+        { x: 1, y: 0 },  // Kick right 1
+        { x: -2, y: 0 }, // Kick left 2
+        { x: 2, y: 0 },  // Kick right 2
+        { x: 0, y: -1 }, // Kick down 1 (for T-spin, but generally useful)
+    ];
+
+    for (const test of kickTests) {
+        currentPiece.pos.x = originalPos.x + test.x;
+        currentPiece.pos.y = originalPos.y + test.y;
+        if (!collide(board, currentPiece)) {
+            // Found a valid position
             return;
         }
     }
+
+    // If no valid position found, revert to original state
+    currentPiece.matrix = originalMatrix;
+    currentPiece.pos = originalPos;
+}
 }
 
 function resetPiece() {
