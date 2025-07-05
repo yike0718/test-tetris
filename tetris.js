@@ -25,7 +25,7 @@ const COLORS = [
 const SHAPES = [
     [], // Empty
     [[1, 1, 1], [0, 1, 0]], // T
-    [[2, 2, 2, 2]], // I
+    [[0, 2, 0, 0], [0, 2, 0, 0], [0, 2, 0, 0], [0, 2, 0, 0]], // I
     [[3, 3], [3, 3]], // O
     [[0, 4, 0], [4, 4, 4]], // L
     [[0, 5, 0], [0, 5, 0], [5, 5, 0]], // J
@@ -46,17 +46,17 @@ function createPiece() {
     const rand = Math.floor(Math.random() * (SHAPES.length - 1)) + 1;
     return {
         matrix: SHAPES[rand].map(row => [...row]),
-        pos: { x: Math.floor(COLS / 2) - 1, y: 0 },
+        pos: { x: Math.floor(COLS / 2) - Math.floor(SHAPES[rand][0].length / 2), y: 0 },
         color: COLORS[rand],
     };
 }
 
-function drawMatrix(matrix, offset) {
+function drawMatrix(matrix, offset, ctx) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                context.fillStyle = COLORS[value];
-                context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                ctx.fillStyle = COLORS[value];
+                ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
             }
         });
     });
@@ -65,24 +65,21 @@ function drawMatrix(matrix, offset) {
 function draw() {
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    drawMatrix(board, { x: 0, y: 0 });
-    drawMatrix(currentPiece.matrix, currentPiece.pos);
+    drawMatrix(board, { x: 0, y: 0 }, context);
+    if (currentPiece) {
+        drawMatrix(currentPiece.matrix, currentPiece.pos, context);
+    }
 }
 
 function drawNext() {
     nextContext.fillStyle = '#000';
     nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-    const matrix = nextPiece.matrix;
-    const x = (nextCanvas.width / BLOCK_SIZE - matrix[0].length) / 2;
-    const y = (nextCanvas.height / BLOCK_SIZE - matrix.length) / 2;
-    matrix.forEach((row, row_y) => {
-        row.forEach((value, col_x) => {
-            if (value !== 0) {
-                nextContext.fillStyle = COLORS[value];
-                nextContext.fillRect(col_x + x, row_y + y, 1, 1);
-            }
-        });
-    });
+    if (nextPiece) {
+        const matrix = nextPiece.matrix;
+        const x = (nextCanvas.width / BLOCK_SIZE - matrix[0].length) / 2;
+        const y = (nextCanvas.height / BLOCK_SIZE - matrix.length) / 2;
+        drawMatrix(matrix, { x: x, y: y }, nextContext);
+    }
 }
 
 function merge(board, piece) {
@@ -99,7 +96,9 @@ function collide(board, piece) {
     const [m, o] = [piece.matrix, piece.pos];
     for (let y = 0; y < m.length; ++y) {
         for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 && (board[y + o.y] && board[y + o.y][x + o.x]) !== 0) {
+            if (m[y][x] !== 0 && (
+                board[y + o.y] && board[y + o.y][x + o.x]
+            ) !== 0) {
                 return true;
             }
         }
@@ -129,7 +128,6 @@ function rotate(matrix, dir) {
 }
 
 function pieceDrop() {
-    console.log('pieceDrop called');
     currentPiece.pos.y++;
     if (collide(board, currentPiece)) {
         currentPiece.pos.y--;
@@ -154,17 +152,12 @@ function pieceRotate() {
 
     currentPiece.matrix = rotate(originalMatrix, 1); // Try clockwise rotation
 
-    // Wall kick attempts
+    // Wall kick attempts (simplified for now, can be expanded for SRS)
     const kickTests = [
         { x: 0, y: 0 }, // No kick
         { x: -1, y: 0 }, // Kick left 1
         { x: 1, y: 0 },  // Kick right 1
-        { x: -2, y: 0 }, // Kick left 2
-        { x: 2, y: 0 },  // Kick right 2
-        { x: 0, y: -1 }, // Kick down 1 (for T-spin, but generally useful)
-        { x: -3, y: 0 }, // Additional kick for I-piece
-        { x: 3, y: 0 },  // Additional kick for I-piece
-        { x: 0, y: -2 }, // Additional kick
+        { x: 0, y: -1 }, // Kick down 1
     ];
 
     for (const test of kickTests) {
@@ -215,7 +208,6 @@ let dropInterval = 1000; // 1 second
 let lastTime = 0;
 
 function update(time = 0) {
-    console.log('update called, score:', score);
     if (score === 'GAME OVER') return;
     const deltaTime = time - lastTime;
     lastTime = time;
