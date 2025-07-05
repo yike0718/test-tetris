@@ -129,6 +129,7 @@ function rotate(matrix, dir) {
 }
 
 function pieceDrop() {
+    console.log('pieceDrop called');
     currentPiece.pos.y++;
     if (collide(board, currentPiece)) {
         currentPiece.pos.y--;
@@ -214,6 +215,7 @@ let dropInterval = 1000; // 1 second
 let lastTime = 0;
 
 function update(time = 0) {
+    console.log('update called, score:', score);
     if (score === 'GAME OVER') return;
     const deltaTime = time - lastTime;
     lastTime = time;
