@@ -108,23 +108,24 @@ function collide(board, piece) {
 }
 
 function rotate(matrix, dir) {
-    for (let y = 0; y < matrix.length; ++y) {
-        for (let x = 0; x < y; ++x) {
-            [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    let newMatrix = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+    if (dir > 0) { // Clockwise rotation
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                newMatrix[x][rows - 1 - y] = matrix[y][x];
+            }
         }
-    }
-    if (dir > 0) {
-        matrix.forEach(row => row.reverse());
-    } else {
-        // Reverse each column for counter-clockwise rotation
-        for (let col = 0; col < matrix[0].length; col++) {
-            for (let row = 0; row < Math.floor(matrix.length / 2); row++) {
-                const temp = matrix[row][col];
-                matrix[row][col] = matrix[matrix.length - 1 - row][col];
-                matrix[matrix.length - 1 - row][col] = temp;
+    } else { // Counter-clockwise rotation
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                newMatrix[cols - 1 - x][y] = matrix[y][x];
             }
         }
     }
+    return newMatrix;
 }
 
 function pieceDrop() {
@@ -149,12 +150,12 @@ function pieceMove(dir) {
 function pieceRotate() {
     const pos = currentPiece.pos.x;
     let offset = 1;
-    rotate(currentPiece.matrix, 1);
+    currentPiece.matrix = rotate(currentPiece.matrix, 1);
     while (collide(board, currentPiece)) {
         currentPiece.pos.x += offset;
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (offset > currentPiece.matrix[0].length) {
-            rotate(currentPiece.matrix, -1);
+            currentPiece.matrix = rotate(currentPiece.matrix, -1);
             currentPiece.pos.x = pos;
             return;
         }
