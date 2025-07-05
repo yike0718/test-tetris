@@ -161,6 +161,9 @@ function pieceRotate() {
         { x: -2, y: 0 }, // Kick left 2
         { x: 2, y: 0 },  // Kick right 2
         { x: 0, y: -1 }, // Kick down 1 (for T-spin, but generally useful)
+        { x: -3, y: 0 }, // Additional kick for I-piece
+        { x: 3, y: 0 },  // Additional kick for I-piece
+        { x: 0, y: -2 }, // Additional kick
     ];
 
     for (const test of kickTests) {
