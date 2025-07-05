@@ -179,7 +179,6 @@ function pieceRotate() {
     currentPiece.matrix = originalMatrix;
     currentPiece.pos = originalPos;
 }
-}
 
 function resetPiece() {
     currentPiece = nextPiece;
