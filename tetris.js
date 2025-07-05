@@ -45,7 +45,7 @@ function createBoard() {
 function createPiece() {
     const rand = Math.floor(Math.random() * (SHAPES.length - 1)) + 1;
     return {
-        matrix: SHAPES[rand],
+        matrix: SHAPES[rand].map(row => [...row]),
         pos: { x: Math.floor(COLS / 2) - 1, y: 0 },
         color: COLORS[rand],
     };
