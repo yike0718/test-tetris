@@ -116,7 +116,14 @@ function rotate(matrix, dir) {
     if (dir > 0) {
         matrix.forEach(row => row.reverse());
     } else {
-        matrix.reverse();
+        // Reverse each column for counter-clockwise rotation
+        for (let col = 0; col < matrix[0].length; col++) {
+            for (let row = 0; row < Math.floor(matrix.length / 2); row++) {
+                const temp = matrix[row][col];
+                matrix[row][col] = matrix[matrix.length - 1 - row][col];
+                matrix[matrix.length - 1 - row][col] = temp;
+            }
+        }
     }
 }
 
